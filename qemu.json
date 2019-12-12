@@ -1,0 +1,53 @@
+{
+  "variables": {
+    "iso_url": "http://ftp.pasteur.fr/mirrors/CentOS/8/isos/x86_64/CentOS-8-x86_64-1905-boot.iso",
+    "iso_checksum": "a7993a0d4b7fef2433e0d4f53530b63c715d3aadbe91f152ee5c3621139a2cbc",
+    "user": "centos",
+    "password": "changeme"
+    
+  },
+  "builders":
+  [
+      {
+        "name": "centos-8.0-x86_64-server",
+        "vm_name": "centos-8.0-x86_64.qcow2",
+
+        "type": "qemu",
+        "format": "qcow2",
+        "accelerator": "kvm",
+		"cpus": 2,
+		"memory": 2048,
+        "disk_size": 8192,
+
+        "net_device": "virtio-net",
+        "disk_interface": "virtio",
+
+        "iso_url": "{{ user `iso_url`}}",
+        "iso_checksum": "{{ user `iso_checksum`}}",
+        "iso_checksum_type": "sha256",
+
+        "output_directory": "output_centos",
+        "http_directory": "http",
+
+        "ssh_username": "{{ user `user`}}",
+        "ssh_password": "{{ user `password`}}",
+        "ssh_timeout": "20m",
+
+        "boot_wait": "10s",
+        "boot_command": [
+          "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos8-ks.cfg<enter><wait>"
+        ],
+        "shutdown_command": "echo 'packer' | sudo -S shutdown -P now"
+      }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+	  "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E sh -c '{{.Path}}'",
+      "scripts": [
+        "scripts/update.sh",
+        "scripts/cleanup.sh"
+      ]
+    }
+  ]
+}
