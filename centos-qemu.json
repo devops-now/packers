@@ -4,7 +4,6 @@
     "iso_checksum": "a7993a0d4b7fef2433e0d4f53530b63c715d3aadbe91f152ee5c3621139a2cbc",
     "user": "centos",
     "password": "changeme"
-    
   },
   "builders":
   [
@@ -15,8 +14,8 @@
         "type": "qemu",
         "format": "qcow2",
         "accelerator": "kvm",
-		"cpus": 2,
-		"memory": 2048,
+        "cpus": 2,
+        "memory": 2048,
         "disk_size": 8192,
 
         "net_device": "virtio-net",
@@ -43,7 +42,7 @@
   "provisioners": [
     {
       "type": "shell",
-	  "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E sh -c '{{.Path}}'",
+      "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E sh -c '{{.Path}}'",
       "scripts": [
         "scripts/update.sh",
         "scripts/cleanup.sh"

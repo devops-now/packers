@@ -1,0 +1,63 @@
+{
+  "variables": {
+    "iso": "[pcc-009585] ISO/CentOS-8-x86_64-1905-dvd1.iso",
+    "iso_checksum": "ea17ef71e0df3f6bf1d4bf1fc25bec1a76d1f211c115d39618fe688be34503e8",
+    "user": "centos",
+    "password": "changeme"
+  },
+  "builders":
+  [
+      {
+        "name": "centos-8.0-x86_64-server",
+        "vm_name": "centos-8.0-x86_64-server",
+
+        "type": "vsphere-iso",
+        "vcenter_server": "changeme.ovh.com",
+        "username": "admin",
+        "password": "changeme",
+        "insecure_connection": false,
+        "cluster": "Cluster1",
+        "resource_pool": "test",
+        "datastore": "pcc-009602",
+
+        "CPUs": 2,
+        "RAM": 4096,
+        "RAM_reserve_all": true,
+
+        "disk_controller_type": "pvscsi",
+        "disk_size": 32768,
+        "disk_thin_provisioned": true,
+        "network_card": "vmxnet3",
+        "network": "VLAN13",
+
+        "iso_paths": [
+                "{{ user `iso`}}"
+        ],
+        "iso_checksum": "{{ user `iso_checksum`}}",
+        "iso_checksum_type": "sha256",
+
+        "http_ip": "10.0.23.5",
+        "http_directory": "http",
+
+        "ssh_username": "{{ user `user`}}",
+        "ssh_password": "{{ user `password`}}",
+        "ssh_timeout": "30m",
+
+        "boot_wait": "10s",
+        "boot_command": [
+          "<up><tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos8-ks.cfg<enter><wait>"
+        ]
+      }
+  ],
+  "provisioners": [
+      {
+          "type": "shell",
+          "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E sh -c '{{.Path}}'",
+          "scripts": [
+                  "scripts/add_ssh.sh",
+                  "scripts/update.sh",
+                  "scripts/cleanup.sh"
+          ]
+      }
+  ]
+}
